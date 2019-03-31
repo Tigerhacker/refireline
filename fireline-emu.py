@@ -1,3 +1,4 @@
+#!/usr/bin/python
 from flask import Flask, request, Response
 import json
 
@@ -9,6 +10,17 @@ myResponses = {
     "PUT"   : {},
 }
 #method:url:dict
+
+debug = False
+
+
+with open('responses.json') as json_file:  
+    data = json.load(json_file)
+
+for d in data:
+    path = d['request']['url'][25:].split('?', 1)[0]
+    myResponses[d['request']['method']][path] = d
+
 
 @app.route('/')
 def hello():
@@ -28,12 +40,12 @@ def hello_name(path):
         resp = Response(response=json.dumps({"ERROR":payload}),
                         status=200,
                         mimetype="application/json")
-        print(">>>MISS")
+        if debug : print(">>>MISS") 
     else:
         resp = Response(response=canned['response']['content'],
                         status=canned['response']['status_code'],
                         mimetype="application/json")
-        print("hit")
+        if debug : print("hit") 
 
 
     return resp
@@ -44,12 +56,6 @@ def lookup(method, path):
             return myResponses[method][path]
     return None
 
-if __name__ == '__main__':
-    with open('responses.json') as json_file:  
-        data = json.load(json_file)
-
-    for d in data:
-        path = d['request']['url'][25:].split('?', 1)[0]
-        myResponses[d['request']['method']][path] = d
-    
-    app.run(port=8080,debug=True)
+if __name__ == '__main__': 
+    debug = True
+    app.run(threaded=True, port=8080, debug=True)
