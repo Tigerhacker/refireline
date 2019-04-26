@@ -56,6 +56,8 @@ def lookup(method, path):
             return myResponses[method][path]
     return None
 
+application = app
+
 if __name__ == '__main__': 
     debug = True
     app.run(threaded=True, port=8080, debug=True)
