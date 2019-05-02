@@ -12,7 +12,8 @@ Join the dicussion here: https://discordapp.com/channels/160055190710386688/5385
 To play single player
 - Download the modified executable here: https://cdn.discordapp.com/attachments/538510896675422258/561258485661171722/Fractured_Space.7z
 - locate your Fractured Space installation root, by default it is located `C:\Program Files (x86)\Steam\steamapps\common\Space`
-- Unpack the downloaded .7z, replace the exe in `<installation root>\spacegame\Binaries\Win64`
+- Unpack the downloaded .7z, backup then replace the exe in `<installation root>\spacegame\Binaries\Win64`
+> TODO: reneame exe in the archive so no overwrite is needed, game doesn't care what the exe is called
 - Make a batch file with these two lines 
 ```
 set SteamAppId=310380
