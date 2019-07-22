@@ -11,6 +11,7 @@ myResponses = {
     "GET"   : {},
     "PUT"   : {},
     "PATCH"   : {},
+    "DELETE"   : {},
 }
 #method:url:dict
 
@@ -46,7 +47,7 @@ def poll():
     def generate():
         yield '["welcome",{"success":true,"data":{"connection_id":"180182b9-ee86-4442-8ba5-2df0aad31e20","connected_at":"Sun, 31 Mar 2019 13:06:12 GMT"}}]\n'
         for i in xrange(300):
-            print("!!!presence: {}".format(i))
+            # print("!!!presence: {}".format(i))
             sleep(1)
             yield "\n"
     return Response(generate(), mimetype='application/x-json-stream')
@@ -56,6 +57,7 @@ from endpoint_o_instances__metadata import handler as o_inst_meta
 from endpoint_o_sessions_create import handler as o_sess_crea
 from endpoint_o_instances__associate_with_session import handler as o_inst_asso
 from endpoint_o_sessions__metadata import handler as o_sess_meta
+from endpoint_o_sessions__touch import handler as o_sess_toch
 
 def hello_world(request, match):
     return (200, "Hello {}!".format(match.group(1)), {})
@@ -65,6 +67,7 @@ DYNAMIC_HANDLERS = {
     r'^o/_sessions/create': o_sess_crea,
     r'o/_instances/([^/]+)/associate_with_session': o_inst_asso,
     r'o/_sessions/([^/]+)/metadata': o_sess_meta,
+    r'o/_sessions/([^/]+)/touch': o_sess_toch,
     r'^hello/(.*)/': hello_world,
 }
 

@@ -146,9 +146,9 @@ class DB:
         return result
 
     def keepaliveSession(self, sid):
-        q = 'UPDATE sessions SET last_keepalive = CURRENT_TIME() WHERE id = %s'
+        q = 'UPDATE sessions SET last_keepalive = CURRENT_TIME() WHERE id = %s;'
         cur = self.getCursor()
-        cur.execute(q, sid)
+        cur.execute(q, (sid,))
         print(cur.statement)
         cur.close()
         self.cnx.commit()

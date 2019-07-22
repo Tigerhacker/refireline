@@ -27,7 +27,7 @@ CREATE TABLE `instances` (
   `name` varchar(240) NOT NULL,
   `time_created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `time_modified` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `attached_session` char(16) DEFAULT NULL,
+  `attached_session` char(36) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
