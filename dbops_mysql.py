@@ -155,6 +155,69 @@ class DB:
 
         return
 
+    def getJoinData(self, session_id):
+        cur = self.getCursor()
+        cur.execute("SELECT server_join_challenge_key, server_match_challenge_key, server_address, server_port FROM sessions WHERE id = %s;", (session_id,))
+        rows = cur.fetchall()
+
+        result = None
+        for row in rows:
+            result = {
+                'server_join_challenge_key': row[0],
+                'server_match_challenge_key': row[1],
+                'server_address': row[2],
+                'server_port': row[3],
+            }
+        return result
+
+    def getInstances(self):
+        q = """SELECT i.id, i.name, i.time_created, i.time_modified, i.attached_session, 
+        s.id, s.name, s.created_at, s.modified_at, s.last_keepalive, s.region, s.slot_count, 
+        s.reservation_count, s.filled_slots, s.free_count, s.state, s.state_name, s.address, 
+        s.port, s.server_address, s.server_port, s.server_join_challenge_key, 
+        s.server_match_challenge_key 
+        FROM instances i INNER JOIN sessions s ON i.attached_session = s.id;"""
+        cur = self.getCursor()
+        cur.execute(q)
+        print(cur.statement)
+        rows = cur.fetchall()
+
+        servers = []
+        for row in rows:
+            res = {
+                'instance':
+                {
+                    'id': row[0],
+                    'name': row[1],
+                    'time_created': row[2],
+                    'time_modified': row[3],
+                    'attached_session': row[4],
+                },
+                'session': {
+                    'id': row[5],
+                    'name': row[6],
+                    'created_at': row[7],
+                    'modified_at': row[8],
+                    'last_keepalive': row[9],
+                    'region': row[10],
+                    'slot_count': row[11],
+                    'reservation_count': row[12],
+                    'filled_slots': row[13],
+                    'free_count': row[14],
+                    'state': row[15],
+                    'state_name': row[16],
+                    'address': row[17],
+                    'port': row[18],
+                    'server_address': row[19],
+                    'server_port': row[20],
+                    'server_join_challenge_key': row[21],
+                    'server_match_challenge_key': row[22],
+                }
+            }
+            servers.append(res)
+
+        return servers
+
     
     @classmethod
     def uuid2hex(cls, uuid):
