@@ -26,6 +26,7 @@ class DB:
                                       host=self.host,
                                       database=self.database,
                                       use_unicode=True)
+            self.cnx.autocommit = True
         except mysql.connector.Error as err:
             if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
                 print("Something is wrong with your user name or password")
@@ -68,7 +69,6 @@ class DB:
         cur.execute(q, (iid, name))
         print(cur.statement)
         cur.close()
-        self.cnx.commit()
         return
     
     def createSession(self, session_id, server_address, server_port, server_join_challenge_key, server_match_challenge_key, 
@@ -83,7 +83,6 @@ class DB:
         cur.execute(q, (session_id, server_address, server_port, server_join_challenge_key, server_match_challenge_key, session_state, session_name, session_region, slot_count, slot_count, timestamp, timestamp))
         print(cur.statement)
         cur.close()
-        self.cnx.commit()
         return
 
     def updateInstanceSession(self, session_id, instance_id):
@@ -92,7 +91,6 @@ class DB:
         cur.execute(q, (session_id, instance_id))
         print(cur.statement)
         cur.close()
-        self.cnx.commit()
         return
 
     def updateSession(self, session_id, update_list):
@@ -118,13 +116,13 @@ class DB:
             cur.execute(q, params)
             print(cur.statement)
             cur.close()
-            self.cnx.commit()
         return
 
     def getSession(self, session_id):
         cur = self.getCursor()
         cur.execute("SELECT name, region, slot_count, filled_slots, free_count, state, state_name, address, port, server_address, server_port, server_join_challenge_key, server_match_challenge_key FROM sessions WHERE id = %s;", (session_id,))
         rows = cur.fetchall()
+        cur.close()
 
         result = {}
         for row in rows:
@@ -151,7 +149,6 @@ class DB:
         cur.execute(q, (sid,))
         print(cur.statement)
         cur.close()
-        self.cnx.commit()
 
         return
 
@@ -159,6 +156,7 @@ class DB:
         cur = self.getCursor()
         cur.execute("SELECT server_join_challenge_key, server_match_challenge_key, server_address, server_port FROM sessions WHERE id = %s;", (session_id,))
         rows = cur.fetchall()
+        cur.close()
 
         result = None
         for row in rows:
@@ -181,6 +179,7 @@ class DB:
         cur.execute(q)
         print(cur.statement)
         rows = cur.fetchall()
+        cur.close()
 
         servers = []
         for row in rows:
