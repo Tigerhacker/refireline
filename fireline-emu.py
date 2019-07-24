@@ -58,16 +58,21 @@ from endpoint_o_sessions_create import handler as o_sess_crea
 from endpoint_o_instances__associate_with_session import handler as o_inst_asso
 from endpoint_o_sessions__metadata import handler as o_sess_meta
 from endpoint_o_sessions__touch import handler as o_sess_toch
+from endpoint_o_instances_list import handler as o_inst_list
+from endpoint_o_sessions__reservations import handler as o_sess_rsvp
 
 def hello_world(request, match):
     return (200, "Hello {}!".format(match.group(1)), {})
 
 DYNAMIC_HANDLERS = {
+    r'^o/_instances/register': o_inst_meta,
     r'^o/_instances/([^/]+)/metadata': o_inst_meta,
     r'^o/_sessions/create': o_sess_crea,
     r'o/_instances/([^/]+)/associate_with_session': o_inst_asso,
-    r'o/_sessions/([^/]+)/metadata': o_sess_meta,
-    r'o/_sessions/([^/]+)/touch': o_sess_toch,
+    r'^o/_sessions/([^/]+)/metadata': o_sess_meta,
+    r'^o/_sessions/([^/]+)/touch': o_sess_toch,
+    r'^o/_instances/list': o_inst_list,
+    r'^o/_sessions/([^/]+)/reservations(?:/([^/]+))?': o_sess_rsvp,
     r'^hello/(.*)/': hello_world,
 }
 
@@ -127,4 +132,4 @@ def lookup(method, path):
 if __name__ == '__main__':
     debug = True
     
-    app.run(threaded=True, port=8080,debug=True)
+    app.run(threaded=True, port=80,debug=True)

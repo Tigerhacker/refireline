@@ -59,4 +59,4 @@ def handler(request, match):
             # return current session info
         return (200, session_data, {})
     else:
-        return methodError(VALID_METHODS)
+        return methodError(['GET'])

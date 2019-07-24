@@ -14,9 +14,18 @@ def human_hash(seed=None):
 
 def handler(request, match):
     from dbops_mysql import DB
-    db = DB()
+    import uuid
+    status = None
+    iid = None
 
-    iid = match.group(1)
+    db = DB()
+    if request.method == 'GET':
+        status = 200
+        iid = match.group(1)
+    elif request.method == 'POST':
+        iid = str(uuid.uuid4())
+        status = 201
+    
     name = human_hash(iid)
 
     db.createInstance(iid, name)
@@ -25,4 +34,4 @@ def handler(request, match):
         'display_name': name,
         'owner': '25721053-ebe8-59f1-95b3-de39bc253c7f'
     }
-    return (200, response, {})
+    return (status, response, {})
