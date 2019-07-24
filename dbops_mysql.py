@@ -174,7 +174,8 @@ class DB:
         s.reservation_count, s.filled_slots, s.free_count, s.state, s.state_name, s.address, 
         s.port, s.server_address, s.server_port, s.server_join_challenge_key, 
         s.server_match_challenge_key 
-        FROM instances i INNER JOIN sessions s ON i.attached_session = s.id;"""
+        FROM instances i INNER JOIN sessions s ON i.attached_session = s.id 
+        WHERE s.last_keepalive >= NOW() - INTERVAL 2.5 MINUTE;"""
         cur = self.getCursor()
         cur.execute(q)
         print(cur.statement)
