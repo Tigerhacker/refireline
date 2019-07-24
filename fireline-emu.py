@@ -95,6 +95,7 @@ def main_handler(path):
 
     if dynamic is not None:
         (status, payload, headers) = dynamic
+        headers['Cache-Control'] = 'no-cache'
         resp = Response(response=json.dumps(payload),
                         status=status,
                         headers=headers,
