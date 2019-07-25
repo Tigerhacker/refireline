@@ -17,7 +17,9 @@ class DB:
         self.host = host
         self.database = database
 
-        assert self.connect()
+        self.cnx = None
+        #lazy connnect to db when needed
+        #assert self.connect()
 
     def connect(self):
         try:
@@ -39,6 +41,8 @@ class DB:
         return True
 
     def getCursor(self):
+        if self.cnx is None:
+            assert self.connect(), "Could not connect to the database"
         try:
             cur = self.cnx.cursor()
         except mysql.connector.Error as err:
