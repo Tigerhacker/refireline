@@ -53,6 +53,7 @@ def poll():
     return Response(generate(), mimetype='application/x-json-stream')
 
 import re, json
+from endpoint_o_instances_register import handler as o_inst_regi
 from endpoint_o_instances__metadata import handler as o_inst_meta
 from endpoint_o_sessions_create import handler as o_sess_crea
 from endpoint_o_instances__associate_with_session import handler as o_inst_asso
@@ -65,7 +66,7 @@ def hello_world(request, match):
     return (200, "Hello {}!".format(match.group(1)), {})
 
 DYNAMIC_HANDLERS = {
-    r'^o/_instances/register': o_inst_meta,
+    r'^o/_instances/register': o_inst_regi,
     r'^o/_instances/([^/]+)/metadata': o_inst_meta,
     r'^o/_sessions/create': o_sess_crea,
     r'o/_instances/([^/]+)/associate_with_session': o_inst_asso,
