@@ -5,6 +5,7 @@ from time import sleep
 import os
 
 app = Flask(__name__)
+application = app
 
 myResponses = {
     "POST"  : {},
@@ -38,7 +39,7 @@ for filename in os.listdir('responses'):
 
 @app.route('/')
 def hello():
-    return "Fireline Emulator for Fractured Space v0.1.0"
+    return "Fireline Emulator for Fractured Space v0.2.0"
 
 
 @app.route('/presence/connect')
@@ -53,6 +54,7 @@ def poll():
     return Response(generate(), mimetype='application/x-json-stream')
 
 import re, json
+from endpoint_auth_oauth2_token import handler as auth_oaut_tokn
 from endpoint_o_instances_register import handler as o_inst_regi
 from endpoint_o_instances__metadata import handler as o_inst_meta
 from endpoint_o_sessions_create import handler as o_sess_crea
@@ -66,6 +68,7 @@ def hello_world(request, match):
     return (200, "Hello {}!".format(match.group(1)), {})
 
 DYNAMIC_HANDLERS = {
+    r'^auth/oauth2/token': auth_oaut_tokn,
     r'^o/_instances/register': o_inst_regi,
     r'^o/_instances/([^/]+)/metadata': o_inst_meta,
     r'^o/_sessions/create': o_sess_crea,
@@ -103,29 +106,65 @@ def main_handler(path):
                         mimetype="application/json")
         return resp
 
-    canned = lookup(request.method, path)
+    detected_userid = None
+    if 'Authorization' in request.headers:
+        detected_userid = request.headers['Authorization'][7:]
+        print("Hello user: {}".format(detected_userid))
+    canned = lookup(request.method, path, detected_userid)
     print(request.query_string)
     if canned is None:
         payload += "\n".join(myResponses['GET'].keys())
         resp = Response(response=json.dumps({"ERROR":payload}),
-                        status=200,
+                        status=404,
                         mimetype="application/json")
         if debug : print(">>>MISS")
         if debug : print(path)
     else:
-        resp = Response(response=json.dumps(canned['response']['content']),
-                        status=canned['response']['status_code'],
+        print("{}".format(request.headers))
+        if detected_userid is not None:
+            canned_mod = sub_outgoing(canned, detected_userid)
+        resp = Response(response=json.dumps(canned_mod['response']['content']),
+                        status=canned_mod['response']['status_code'],
                         mimetype="application/json")
         if debug : print("hit")
 
 
     return resp
 
-def strip_identity(path):
-    return re.sub(r'/_identities/[^/]+/', '/_identities/00000000-0000-0000-0000-000000000000/', path)
+def strip_incoming_identity(path, detected_userid):
+    #not really, but we are setting it to what we recorded
+    if detected_userid is None:
+        return re.sub(r'/_identities/[^/]+/', '/_identities/197a97fc-4179-43f4-b009-9432ac0c8e53/', path)
+    else:
+        if re.match('^o/player_status/', path):
+            return re.sub(r'o/player_status/.*', 'o/player_status/38662703-6375-3ae3-8558-1a2238c0f088', path)
+        elif re.match('^o/player_data/', path):
+            return re.sub(r'o/player_data/.*', 'o/player_data/11f07816-c552-331d-a81c-4b43f126d7bf', path)
+        elif re.match('^o/player_info/', path):
+            return re.sub(r'o/player_info/.*', 'o/player_info/d649cb45-cc6e-3914-ba71-d84cfa9db5e0', path)
+        else:
+            return path.replace(detected_userid, '197a97fc-4179-43f4-b009-9432ac0c8e53')
 
-def lookup(method, path):
-    # path = strip_identity(path)
+def sub_outgoing0(payload, new_string, old_string="197a97fc-4179-43f4-b009-9432ac0c8e53"):
+    '''Scan outgoing data for my user-uid and replace it with the auto-generated one
+    '''
+    new = {}
+    for k, v in payload.iteritems():
+        if isinstance(v, dict):
+            new['k'] = sub_outgoing(v, new_string, old_string)
+        elif v == old_string:
+            print("{}:{}".format(k, v))
+            new[k] = new_string
+        else:
+            new['k'] = v
+
+    return new
+
+def sub_outgoing(payload, new_string, old_string="197a97fc-4179-43f4-b009-9432ac0c8e53"):
+    return  json.loads(json.dumps(payload).replace(old_string, new_string))
+
+def lookup(method, path, detected_userid=None):
+    path = strip_incoming_identity(path, detected_userid)
     if method in myResponses.keys():
         if path in myResponses[method].keys():
             return myResponses[method][path]
@@ -134,4 +173,4 @@ def lookup(method, path):
 if __name__ == '__main__':
     debug = True
     
-    app.run(threaded=True, port=80,debug=True)
+    app.run(threaded=True, port=8080,debug=True)
