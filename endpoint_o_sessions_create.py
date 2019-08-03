@@ -26,13 +26,14 @@ def handler(request, match): #get db as param
             server_join_challenge_key = payload['join_params']['joinChallengeKey']
             server_match_challenge_key = payload['join_params']['matchChallengeKey']
             session_state = payload['attributes']['state']
+            session_game_mode = payload['attributes']['gameMode']
             session_name = payload['name']
             session_region = payload['region']
             session_slot_count = payload['slot_count']
         except:
             return valueError()
 
-        db.createSession(session_id, server_address, server_port, server_join_challenge_key, server_match_challenge_key, session_state, session_name, session_region, session_slot_count, timestamp)
+        db.createSession(session_id, server_address, server_port, server_join_challenge_key, server_match_challenge_key, session_state, session_name, session_region, session_slot_count, timestamp, session_game_mode)
 
         response = {
             "_created_at": timestring,
@@ -41,7 +42,7 @@ def handler(request, match): #get db as param
             "_type": "_sessions", #static
             "attributes": {
                 "disableJoining": payload['attributes']['disableJoining'],
-                "gameMode": payload['attributes']['gameMode'],
+                "gameMode": session_game_mode,
                 "ip": server_address,
                 "public": payload['attributes']['public'],
                 "serverProfile": payload['attributes']['serverProfile'],

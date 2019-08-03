@@ -10,7 +10,7 @@ VALUE_MAP = {
     'attributes': {
         "disableJoining": None,
         "freeCount": 'free_count',
-        "gameMode": None,
+        "gameMode": 'game_mode',
         "joinChallengeKey": None, #this modifies attribute, not Join_params, which is not stored currently!
         "playerCount": 'filled_slots',
         "public": None,
@@ -98,7 +98,7 @@ def handler(request, match):
             "attributes": {
                 "disableJoining": 0,
                 "freeCount": res['free_count'],
-                "gameMode": "conquest",
+                "gameMode": res['game_mode'],
                 "joinChallengeKey": res['server_join_challenge_key'],
                 "playerCount": res['free_count'],
                 "public": 1,

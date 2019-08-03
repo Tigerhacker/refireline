@@ -76,15 +76,15 @@ class DB:
         return
     
     def createSession(self, session_id, server_address, server_port, server_join_challenge_key, server_match_challenge_key, 
-                    session_state, session_name, session_region, slot_count, timestamp):
+                    session_state, session_name, session_region, slot_count, timestamp, game_mode):
 
         q = ("""INSERT INTO sessions 
             (id, server_address, server_port, server_join_challenge_key, server_match_challenge_key, 
-            state, state_name, name, region, slot_count, free_count, created_at, modified_at) VALUES 
-            (%s, %s, %s, %s, %s, %s, "created", %s, %s, %s, %s, %s, %s) ON DUPLICATE KEY UPDATE id=id;""")
+            state, state_name, name, region, slot_count, free_count, created_at, modified_at, game_mode) VALUES 
+            (%s, %s, %s, %s, %s, %s, "created", %s, %s, %s, %s, %s, %s, %s) ON DUPLICATE KEY UPDATE id=id;""")
             
         cur = self.getCursor()
-        cur.execute(q, (session_id, server_address, server_port, server_join_challenge_key, server_match_challenge_key, session_state, session_name, session_region, slot_count, slot_count, timestamp, timestamp))
+        cur.execute(q, (session_id, server_address, server_port, server_join_challenge_key, server_match_challenge_key, session_state, session_name, session_region, slot_count, slot_count, timestamp, timestamp, game_mode))
         print(cur.statement)
         cur.close()
         return
@@ -124,7 +124,7 @@ class DB:
 
     def getSession(self, session_id):
         cur = self.getCursor()
-        cur.execute("SELECT name, region, slot_count, filled_slots, free_count, state, state_name, address, port, server_address, server_port, server_join_challenge_key, server_match_challenge_key FROM sessions WHERE id = %s;", (session_id,))
+        cur.execute("SELECT name, region, slot_count, filled_slots, free_count, state, state_name, address, port, server_address, server_port, server_join_challenge_key, server_match_challenge_key, game_mode FROM sessions WHERE id = %s;", (session_id,))
         rows = cur.fetchall()
         cur.close()
 
@@ -144,6 +144,7 @@ class DB:
                 'server_port': row[10],
                 'server_join_challenge_key': row[11],
                 'server_match_challenge_key': row[12],
+                'game_mode': row[13],
             }
         return result
 
@@ -177,7 +178,7 @@ class DB:
         s.id, s.name, s.created_at, s.modified_at, s.last_keepalive, s.region, s.slot_count, 
         s.reservation_count, s.filled_slots, s.free_count, s.state, s.state_name, s.address, 
         s.port, s.server_address, s.server_port, s.server_join_challenge_key, 
-        s.server_match_challenge_key 
+        s.server_match_challenge_key, s.game_mode
         FROM instances i INNER JOIN sessions s ON i.attached_session = s.id 
         WHERE s.last_keepalive >= NOW() - INTERVAL 2.5 MINUTE;"""
         cur = self.getCursor()
@@ -216,6 +217,7 @@ class DB:
                     'server_port': row[20],
                     'server_join_challenge_key': row[21],
                     'server_match_challenge_key': row[22],
+                    'game_mode': row[23],
                 }
             }
             servers.append(res)

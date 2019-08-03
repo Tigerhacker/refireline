@@ -33,7 +33,7 @@ def handler(request, match):
                         "freeCount": r['session']['free_count'],
                         "playerCount": r['session']['filled_slots'], #is this the right value mapping?
                         "disableJoining": 0,
-                        "gameMode": "conquest",
+                        "gameMode": r['session']['game_mode'],
                         "state": r['session']['state'],
                         "serverPort": r['session']['port'],
                         "public": 1,
