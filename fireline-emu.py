@@ -142,6 +142,14 @@ def strip_incoming_identity(path, detected_userid):
             return re.sub(r'o/player_data/.*', 'o/player_data/11f07816-c552-331d-a81c-4b43f126d7bf', path)
         elif re.match('^o/player_info/', path):
             return re.sub(r'o/player_info/.*', 'o/player_info/d649cb45-cc6e-3914-ba71-d84cfa9db5e0', path)
+        elif re.match('^o/player_wallet/', path):
+            return re.sub(r'o/player_wallet/.*', 'o/player_wallet/b474182f-f5b4-3518-b1bc-d06fe5e4ca23', path)
+        elif re.match('^o/crew_meta/', path):
+            return re.sub(r'o/crew_meta/.*', 'o/crew_meta/9dbfee14-f265-35a5-b572-0c018a39faca', path)
+        elif re.match('^o/player_stats/', path):
+            return re.sub(r'o/player_stats/.*', 'o/player_stats/bc7f731e-6af2-3f60-a2e0-5d938d5e3340', path)
+        elif re.match('^o/player_medals/', path):
+            return re.sub(r'o/player_medals/.*', 'o/player_medals/857ae962-0d37-35a6-95ee-9c549d11365f', path)
         else:
             return path.replace(detected_userid, '197a97fc-4179-43f4-b009-9432ac0c8e53')
 
