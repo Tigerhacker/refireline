@@ -3,9 +3,16 @@ from common_errors import methodError
 
 def handler(request, match):
     import uuid
+    import json
     
     if request.method == 'POST':
-        transient_uid = str(uuid.uuid4())
+        try:
+            payload = json.loads(request.data)
+            user_data = json.loads(payload['ticket'])
+            transient_uid = user_data['uuid']
+            print("Authorising user: {}".format(transient_uid))
+        except:
+            transient_uid = str(uuid.uuid4())
         # transient_uid = '197a97fc-4179-43f4-b009-9432ac0c8e53'
 
         response = {
