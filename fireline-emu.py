@@ -5,8 +5,9 @@ from time import sleep
 import os
 
 debug = False
+error_code = 200
 try:
-    from appEnvironment import debug
+    from appEnvironment import debug, error_code
 except:
     print("Running as production")
     pass
@@ -128,7 +129,7 @@ def main_handler(path):
     if canned is None:
         payload += "\n".join(myResponses['GET'].keys())
         resp = Response(response=json.dumps({"ERROR":payload}),
-                        status=404,
+                        status=error_code,
                         mimetype="application/json")
         if debug: print(">>>MISS:{}".format(path))
     else:
