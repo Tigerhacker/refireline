@@ -225,7 +225,7 @@ class DB:
         return servers
 
     def touchIdentity(self, netid):
-        q = "INSERT INTO identities (netid, last_seen) VALUES(%s, NOW()) ON DUPLICATE KEY UPDATE last_seen = NOW()"
+        q = "INSERT INTO identities (netid, last_seen) VALUES(UNHEX(%s), NOW()) ON DUPLICATE KEY UPDATE last_seen = NOW()"
         cur = self.getCursor()
         cur.execute(q, (self.uuid2hex(netid),))
         print(cur.statement)
