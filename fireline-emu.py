@@ -63,6 +63,8 @@ from endpoint_o_sessions__metadata import handler as o_sess_meta
 from endpoint_o_sessions__touch import handler as o_sess_toch
 from endpoint_o_instances_list import handler as o_inst_list
 from endpoint_o_sessions__reservations import handler as o_sess_rsvp
+from endpoint_o_match_history import handler as o_matc_hist
+from endpoint_o_identities__active import handler as o_iden_acti
 
 def hello_world(request, match):
     return (200, "Hello {}!".format(match.group(1)), {})
@@ -77,6 +79,8 @@ DYNAMIC_HANDLERS = {
     r'^o/_sessions/([^/]+)/touch': o_sess_toch,
     r'^o/_instances/list': o_inst_list,
     r'^o/_sessions/([^/]+)/reservations(?:/([^/]+))?': o_sess_rsvp,
+    r'^o/match_history/([0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12})': o_matc_hist,
+    r'^o/_identities/([0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12})/active': o_iden_acti,
     r'^hello/(.*)/': hello_world,
 }
 
