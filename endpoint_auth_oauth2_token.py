@@ -8,9 +8,13 @@ def handler(request, match):
     if request.method == 'POST':
         try:
             payload = json.loads(request.data)
-            user_data = json.loads(payload['ticket'])
-            transient_uid = user_data['uuid']
-            print("Authorising user: {}".format(transient_uid))
+            if payload['client_id'] == "41dc557e-a0cb-547d-8175-dff1bc49ad21":
+                # this is a server, stop generating new IDs for this to allow better tracking of user numbers
+                transient_uid = "25721053-ebe8-59f1-95b3-de39bc253c7f"
+            else:
+                user_data = json.loads(payload['ticket'])
+                transient_uid = user_data['uuid']
+                print("Authorising user: {}".format(transient_uid))
         except:
             transient_uid = str(uuid.uuid4())
         # transient_uid = '197a97fc-4179-43f4-b009-9432ac0c8e53'
