@@ -4,18 +4,27 @@ from mysql.connector import errorcode
 
 import dbpw
 
+global_debug = False
+try:
+    from appEnvironment import debug as global_debug
+except:
+    print("Running DB as production")
+    pass
+
 class DB:
     def __init__(
         self,
         user = dbpw.user,
         password = dbpw.password,
         host = dbpw.host,
-        database = dbpw.database ):
+        database = dbpw.database,
+        debug=global_debug ):
 
         self.user = user
         self.password = password
         self.host = host
         self.database = database
+        self.debug = debug
 
         self.cnx = None
         #lazy connnect to db when needed
@@ -71,7 +80,7 @@ class DB:
         q = "INSERT INTO instances (`id`, `name`) VALUES (%s, %s) ON DUPLICATE KEY UPDATE id=id;"
         cur = self.getCursor()
         cur.execute(q, (iid, name))
-        print(cur.statement)
+        if self.debug: print(cur.statement)
         cur.close()
         return
     
@@ -85,7 +94,7 @@ class DB:
             
         cur = self.getCursor()
         cur.execute(q, (session_id, server_address, server_port, server_join_challenge_key, server_match_challenge_key, session_state, session_name, session_region, slot_count, slot_count, timestamp, timestamp, game_mode))
-        print(cur.statement)
+        if self.debug: print(cur.statement)
         cur.close()
         return
 
@@ -93,7 +102,7 @@ class DB:
         q = "UPDATE instances SET attached_session = %s WHERE id = %s;"
         cur = self.getCursor()
         cur.execute(q, (session_id, instance_id))
-        print(cur.statement)
+        if self.debug: print(cur.statement)
         cur.close()
         return
 
@@ -112,13 +121,13 @@ class DB:
             for col in cols:
                 q = q + ' {} = %s,'.format(col)
             q = q[:-1] + ' WHERE id = %s;'
-            print(q)
+            if self.debug: print(q)
 
             params.append(session_id)
 
             cur = self.getCursor()
             cur.execute(q, params)
-            print(cur.statement)
+            if self.debug: print(cur.statement)
             cur.close()
         return
 
@@ -152,7 +161,7 @@ class DB:
         q = 'UPDATE sessions SET last_keepalive = NOW() WHERE id = %s;'
         cur = self.getCursor()
         cur.execute(q, (sid,))
-        print(cur.statement)
+        if self.debug: print(cur.statement)
         cur.close()
 
         return
@@ -183,7 +192,7 @@ class DB:
         WHERE s.last_keepalive >= NOW() - INTERVAL 2.5 MINUTE;"""
         cur = self.getCursor()
         cur.execute(q)
-        print(cur.statement)
+        if self.debug: print(cur.statement)
         rows = cur.fetchall()
         cur.close()
 
@@ -228,7 +237,7 @@ class DB:
         q = "INSERT INTO identities (netid, last_seen) VALUES(UNHEX(%s), NOW()) ON DUPLICATE KEY UPDATE last_seen = NOW()"
         cur = self.getCursor()
         cur.execute(q, (self.uuid2hex(netid),))
-        print(cur.statement)
+        if self.debug: print(cur.statement)
         cur.close()
 
         return

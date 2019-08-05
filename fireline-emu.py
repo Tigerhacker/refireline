@@ -4,6 +4,13 @@ import re
 from time import sleep
 import os
 
+debug = False
+try:
+    from appEnvironment import debug
+except:
+    print("Running as production")
+    pass
+
 app = Flask(__name__)
 application = app
 
@@ -44,7 +51,7 @@ def hello():
 
 @app.route('/presence/connect')
 def poll():
-    print("!!!CONNECT: {}".format(request.headers))
+    # if debug: print("!!!LongPoll: {}".format(request.headers))
     def generate():
         yield '["welcome",{"success":true,"data":{"connection_id":"180182b9-ee86-4442-8ba5-2df0aad31e20","connected_at":"Sun, 31 Mar 2019 13:06:12 GMT"}}]\n'
         for i in xrange(300):
@@ -113,18 +120,19 @@ def main_handler(path):
     detected_userid = None
     if 'Authorization' in request.headers:
         detected_userid = request.headers['Authorization'][7:]
-        print("Hello user: {}".format(detected_userid))
+        if debug: print("Hello user: {}".format(detected_userid))
+
     canned = lookup(request.method, path, detected_userid)
-    print(request.query_string)
+    if debug: print(request.query_string)
+
     if canned is None:
         payload += "\n".join(myResponses['GET'].keys())
         resp = Response(response=json.dumps({"ERROR":payload}),
                         status=404,
                         mimetype="application/json")
-        if debug : print(">>>MISS")
-        if debug : print(path)
+        if debug: print(">>>MISS:{}".format(path))
     else:
-        print("{}".format(request.headers))
+        if debug: print("{}".format(request.headers))
         if detected_userid is not None:
             canned_mod = sub_outgoing(canned, detected_userid)
         resp = Response(response=json.dumps(canned_mod['response']['content']),
@@ -183,6 +191,6 @@ def lookup(method, path, detected_userid=None):
     return None
 
 if __name__ == '__main__':
-    debug = True
+    # debug = True
     
     app.run(threaded=True, port=8080,debug=True)
